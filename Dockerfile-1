@@ -1,0 +1,25 @@
+FROM ubuntu:16.04
+
+MAINTAINER SONTHANH<son.thanh@zinnoinc.com>
+
+RUN DEBIAN_FONTEND=noninteractive && dpkg --add-architecture i386 && apt-get update && apt-get install -y \
+  libc6:i386          \
+  libncurses5:i386    \
+  libstdc++6:i386     \
+  zlib1g:i386         \
+  gcc-arm-none-eabi   \
+  build-essential
+ 
+COPY /toolchains /toolchains
+
+WORKDIR /toolchains
+
+RUN tar -xvzf /toolchains/ov798_toolchain_50494.tgz -C / \
+  && printf "y\n/\n" | ./ov798_mpu_toolchain_32006.bin
+
+COPY /ov798_dev /ov798_dev
+WORKDIR /ov798_dev
+ENV PATH="/opt/ba-elf/bin:${PATH}"
+ENV PATH="/opt/arm-none-eabi/bin:${PATH}"
+
+RUN /ov798_dev/autobuild.sh easycam_rd15_sc20_ov2736_fast

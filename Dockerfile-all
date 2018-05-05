@@ -1,0 +1,58 @@
+FROM ubuntu:16.04
+
+LABEL maintainer="Nguyen Thanh Son <son.thanh@zinnoinc.com>"
+
+RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
+  libc6:i386                    \
+  libx11-6:i386                 \
+  libasound2:i386               \
+  libatk1.0-0:i386              \
+  libcairo2:i386                \
+  libcups2:i386                 \
+  libdbus-glib-1-2:i386         \
+  libgconf-2-4:i386             \
+  libgcrypt20:i386              \
+  libgdk-pixbuf2.0-0:i386       \
+  libgtk-3-0:i386               \
+  libice6:i386                  \
+  libncurses5:i386              \
+  libsm6:i386                   \
+  liborbit2:i386                \
+  libudev1:i386                 \
+  libusb-0.1-4:i386             \
+  libstdc++6:i386               \
+  libstdc++6                    \
+  libxt6                        \
+  libxt6:i386                   \
+  libxtst6:i386                 \
+  libgnomeui-0:i386             \
+  libusb-1.0-0-dev:i386         \
+  libcanberra-gtk-module:i386   \
+  gtk2-engines-murrine:i386     \
+  zlib1g:i386                   \
+  libpython2.7                  \
+  gcc-arm-none-eabi             \
+  build-essential               \
+  unzip                         \
+  wget                          \
+  vim
+
+COPY /ccs/  /ccs_install
+COPY /toolchains /toolchains
+COPY compile-pluto.sh ./
+
+RUN dpkg -i /ccs_install/libgcrypt11_1.5.3-2ubuntu4.2_amd64.deb         \
+  && dpkg -i /ccs_install/libudev0_175-0ubuntu19_i386.deb               \
+  && export JAVA_TOOL_OPTIONS=-Xss1280k                                 \
+  && mkdir /etc/udev/rules.d                                            \
+  && tar -xvzf /toolchains/ov798_toolchain_50494.tgz -C /               \
+  && printf "y\n/\n" | /toolchains/ov798_mpu_toolchain_32006.bin        \
+  && mkdir /workspace                                                   \
+  && /ccs_install/CCS7.3.0.00019_linux-x64/ccs_setup_linux64_7.3.0.00019.bin --mode unattended --prefix /opt/ti --response-file /ccs_install/response_custom.txt                                                   \
+  && rm -rf /ccs_install                                                \
+  && rm -rf /toolchains                                                 \
+  && chmod +x compile-pluto.sh
+
+ENV PATH="/opt/ti/ccsv7/eclipse:${PATH}"  
+ENV PATH="/opt/ba-elf/bin:${PATH}"  
+ENV PATH="/opt/arm-none-eabi/bin:${PATH}"
