@@ -1,6 +1,6 @@
 FROM ubuntu:16.04
 
-LABEL maintainer="Cedric Gerber <gerber.cedric@gmail.com>"
+LABEL maintainer="Nguyen Thanh Son <son.thanh@zinnoinc.com>"
 
 
 RUN dpkg --add-architecture i386 && apt-get update && apt-get install -y \
